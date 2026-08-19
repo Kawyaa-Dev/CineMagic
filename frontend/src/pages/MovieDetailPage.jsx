@@ -149,7 +149,7 @@ const MovieDetailPage = () => {
           <div className="lg:col-span-1">
             <div className="rounded-2xl overflow-hidden shadow-2xl bg-gray-800">
               <img
-                src={movie.poster_url || 'https://via.placeholder.com/400x600/6b21a8/ffffff?text=No+Poster'}
+                src={`http://localhost:8000${movie.poster_url}`}
                 alt={movie.title}
                 className="w-full h-auto object-cover"
                 onError={(e) => {

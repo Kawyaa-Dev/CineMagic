@@ -16,6 +16,10 @@ import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import PrivateRoute from './components/PrivateRoute';
+import ContactPage from './pages/ContactPage';
+import FAQPage from './pages/FAQPage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 function App() {
   return (
@@ -32,10 +36,13 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/seat-selection/:showId" element={<PrivateRoute><SeatSelectionPage /></PrivateRoute>} />
               <Route path="/checkout/:bookingId" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
-              {/* ✅ NEW ROUTE FOR CONFIRMATION */}
               <Route path="/booking-confirmation/:bookingId" element={<PrivateRoute><BookingConfirmationPage /></PrivateRoute>} />
               <Route path="/bookings" element={<PrivateRoute><BookingHistoryPage /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/refund-policy" element={<RefundPolicyPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>

@@ -312,10 +312,12 @@ const SeatSelectionPage = () => {
           <div className="flex items-center gap-4">
             <div className="w-16 h-20 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0 shadow-lg">
               <img 
-                src={show?.movie_detail?.poster_url || 'https://via.placeholder.com/64x80'} 
+                src={`http://localhost:8000${show?.movie_detail?.poster_url}`}
                 alt={show?.movie_detail?.title}
                 className="w-full h-full object-cover"
-                onError={(e) => { e.target.src = 'https://via.placeholder.com/64x80'; }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/64x80';
+                }}
               />
             </div>
             <div>

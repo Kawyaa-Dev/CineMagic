@@ -121,7 +121,7 @@ const HomePage = () => {
               >
                 <div className="relative h-80 bg-gray-700">
                   <img
-                    src={movie.poster_url || 'https://via.placeholder.com/300x450/6b21a8/ffffff?text=No+Poster'}
+                    src={`http://localhost:8000${movie.poster_url}`}
                     alt={movie.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {

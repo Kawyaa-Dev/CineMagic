@@ -85,11 +85,12 @@ const MoviesPage = () => {
               >
                 <div className="relative h-64 bg-gray-700">
                   <img
-                    src={movie.poster_url || 'https://via.placeholder.com/300x450/1a1a1a/ffffff?text=No+Poster'}
+                    src={`http://localhost:8000${movie.poster_url}`}
                     alt={movie.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x450/1a1a1a/ffffff?text=No+Poster';
+                      console.log('Image failed:', movie.poster_url);
+                      e.target.src = 'https://via.placeholder.com/300x450/6b21a8/ffffff?text=No+Poster';
                     }}
                   />
                   <div className="absolute top-2 right-2 bg-black/70 px-3 py-1 rounded-full">

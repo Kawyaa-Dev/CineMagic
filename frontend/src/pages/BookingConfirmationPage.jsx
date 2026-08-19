@@ -160,7 +160,7 @@ const BookingConfirmationPage = () => {
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-20 h-28 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
                   <img 
-                    src={movie?.poster_url || 'https://via.placeholder.com/80x112'} 
+                    src={`http://localhost:8000${movie?.poster_url}`}
                     alt={movie?.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
