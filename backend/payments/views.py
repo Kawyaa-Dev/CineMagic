@@ -12,11 +12,13 @@ class CreatePaymentIntentView(APIView):
     
     def post(self, request):
         booking_id = request.data.get('booking_id')
-        amount = request.data.get('amount')
+        amount = request.data.get('amount')  # This is in rupees
         
         try:
             booking = Booking.objects.get(id=booking_id, user=request.user)
-            final_amount = amount or int(booking.total_price * 100)
+            
+            # ✅ Convert rupees to paise/cents for Stripe
+            final_amount = int(amount * 100)
             
             intent = stripe.PaymentIntent.create(
                 amount=final_amount,
@@ -45,7 +47,7 @@ class ConfirmPaymentView(APIView):
     def post(self, request):
         payment_intent_id = request.data.get('payment_intent_id')
         booking_id = request.data.get('booking_id')
-        final_amount = request.data.get('final_amount')
+        final_amount = request.data.get('final_amount')  # This is in rupees
         
         try:
             intent = stripe.PaymentIntent.retrieve(payment_intent_id)
@@ -54,13 +56,19 @@ class ConfirmPaymentView(APIView):
                 booking = Booking.objects.get(id=booking_id, user=request.user)
                 booking.status = 'CONFIRMED'
                 booking.payment_id = payment_intent_id
+                
+                # ✅ final_amount is already in rupees
                 if final_amount:
-                    booking.total_price = final_amount / 100
+                    booking.total_price = final_amount
+                else:
+                    booking.total_price = intent.amount / 100
+                
                 booking.save()
                 
                 return Response({
                     'success': True,
                     'booking': booking.id,
+                    'amount': booking.total_price,
                     'message': 'Payment successful!'
                 })
             else:

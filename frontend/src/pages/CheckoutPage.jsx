@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 import { FaArrowLeft, FaCreditCard, FaMobileAlt, FaUniversity, FaWallet, FaLock } from 'react-icons/fa';
 import { SiPhonepe, SiGooglepay, SiPaytm } from 'react-icons/si';
 
-// ✅ Replace with YOUR Stripe PUBLISHABLE key (starts with pk_test_)
 const stripePromise = loadStripe('pk_test_51U58BBQ04lKSGTz4q6phSQ3qsYRzUfi5auhSGOT51ezWeuQmB64iKPmCVqQGkajUNimzZvPue1TH0yK7rEhIUiNw00DQPTDHmQ');
 
 // Payment Methods
@@ -30,7 +29,7 @@ const BANKS = [
   'Kotak Mahindra Bank', 'Yes Bank', 'Punjab National Bank', 'Canara Bank'
 ];
 
-// Screen types with multipliers
+// ✅ FIXED: Screen types with multipliers
 const SCREEN_TYPES = {
   '2D': { label: '2D', multiplier: 1 },
   '3D': { label: '3D', multiplier: 1.3 },
@@ -38,7 +37,7 @@ const SCREEN_TYPES = {
   '4DX': { label: '4DX', multiplier: 2 },
 };
 
-// Check if seat is Premium (rows A-F)
+// ✅ FIXED: Check if seat is Premium (rows A-F)
 const isPremiumSeat = (seat) => {
   if (!seat) return false;
   const row = seat.charAt(0);
@@ -56,12 +55,14 @@ const CheckoutForm = ({ booking, onPaymentSuccess }) => {
   const [selectedScreenType, setSelectedScreenType] = useState('2D');
   const navigate = useNavigate();
 
-  // Calculate price
-  const basePrice = parseFloat(booking?.show_detail?.price) || 230;
+  // ✅ FIXED: Calculate price correctly
+  const basePrice = parseFloat(booking?.show_detail?.price) || 210;
   const seatCount = booking?.seats?.length || 0;
   const hasPremium = booking?.seats?.some(seat => isPremiumSeat(seat));
   const seatMultiplier = hasPremium ? 1.5 : 1;
   const screenMultiplier = SCREEN_TYPES[selectedScreenType]?.multiplier || 1;
+  
+  // ✅ FIXED: Price per seat = base × screen × seat category
   const pricePerSeat = Math.round(basePrice * screenMultiplier * seatMultiplier);
   const totalPrice = pricePerSeat * seatCount;
 
@@ -70,7 +71,6 @@ const CheckoutForm = ({ booking, onPaymentSuccess }) => {
     setProcessing(true);
 
     try {
-      // For card payments, use Stripe
       if (selectedMethod === 'card') {
         if (!stripe || !elements) {
           toast.error('Stripe not initialized');
@@ -93,9 +93,10 @@ const CheckoutForm = ({ booking, onPaymentSuccess }) => {
           return;
         }
 
+        // ✅ FIXED: Send totalPrice (in rupees), backend will convert to paise
         const intentResponse = await axios.post('http://localhost:8000/api/create-payment-intent/', {
           booking_id: booking.id,
-          amount: totalPrice * 100,
+          amount: totalPrice,  // ← Send in rupees
           screen_type: selectedScreenType,
         });
 
@@ -117,15 +118,12 @@ const CheckoutForm = ({ booking, onPaymentSuccess }) => {
         });
 
       } else {
-        // For other payment methods (simulate)
         await new Promise(resolve => setTimeout(resolve, 1500));
         toast.success(`${paymentMethods.find(m => m.id === selectedMethod)?.label} payment successful!`);
       }
 
       toast.success('🎉 Payment successful! Tickets booked.');
       onPaymentSuccess();
-      
-      // ✅ FIXED: Redirect to booking confirmation page
       navigate(`/booking-confirmation/${booking.id}`);
       
     } catch (error) {
@@ -278,22 +276,32 @@ const CheckoutForm = ({ booking, onPaymentSuccess }) => {
         {renderPaymentForm()}
       </div>
 
-      {/* Price Breakdown */}
+      {/* ✅ FIXED: Price Breakdown - Shows correct calculation */}
       <div className="bg-gray-800/50 rounded-xl p-4 border border-white/5">
         <div className="space-y-1 text-sm">
-          <div className="flex justify-between"><span className="text-gray-400">Base Price</span><span className="text-white">₹{basePrice}</span></div>
-          <div className="flex justify-between"><span className="text-gray-400">Screen ({SCREEN_TYPES[selectedScreenType]?.label})</span><span className="text-white">×{SCREEN_TYPES[selectedScreenType]?.multiplier}</span></div>
-          <div className="flex justify-between"><span className="text-gray-400">Seat ({hasPremium ? 'Premium' : 'Standard'})</span><span className="text-white">×{seatMultiplier}</span></div>
-          <div className="flex justify-between"><span className="text-gray-400">Seats</span><span className="text-white">{seatCount}</span></div>
-          <div className="border-t border-white/10 pt-2 mt-2">
-            <div className="flex justify-between">
-              <span className="text-gray-300 font-medium">Price Per Seat</span>
-              <span className="text-white font-bold">₹{pricePerSeat}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300 font-bold text-lg">Total</span>
-              <span className="text-2xl font-bold text-transparent bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text">₹{totalPrice}</span>
-            </div>
+          <div className="flex justify-between border-b border-white/5 pb-1">
+            <span className="text-gray-400">Base Price (per seat)</span>
+            <span className="text-white font-medium">₹{basePrice}</span>
+          </div>
+          <div className="flex justify-between border-b border-white/5 pb-1">
+            <span className="text-gray-400">Screen ({SCREEN_TYPES[selectedScreenType]?.label})</span>
+            <span className="text-white">× {SCREEN_TYPES[selectedScreenType]?.multiplier}</span>
+          </div>
+          <div className="flex justify-between border-b border-white/5 pb-1">
+            <span className="text-gray-400">Seat ({hasPremium ? 'Premium ⭐' : 'Standard'})</span>
+            <span className="text-white">× {seatMultiplier}</span>
+          </div>
+          <div className="flex justify-between border-b border-white/5 pb-1">
+            <span className="text-gray-400">Number of Seats</span>
+            <span className="text-white">{seatCount}</span>
+          </div>
+          <div className="flex justify-between pt-2 mt-1 border-t-2 border-purple-500/30">
+            <span className="text-gray-300 font-medium">Price Per Seat</span>
+            <span className="text-white font-bold text-lg">₹{pricePerSeat}</span>
+          </div>
+          <div className="flex justify-between pt-1">
+            <span className="text-gray-300 font-bold text-lg">Total Amount</span>
+            <span className="text-2xl font-bold text-transparent bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text">₹{totalPrice}</span>
           </div>
         </div>
       </div>

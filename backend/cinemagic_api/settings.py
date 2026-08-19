@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
 from datetime import timedelta
 
@@ -122,8 +124,8 @@ SIMPLE_JWT = {
 }
 
 # Stripe
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51U58BBQ04lKSGTz4q6phSQ3qsYRzUfi5auhSGOT51ezWeuQmB64iKPmCVqQGkajUNimzZvPue1TH0yK7rEhIUiNw00DQPTDHmQ'
-STRIPE_SECRET_KEY = 'sk_test_51U58BBQ04lKSGTz4HKqhpCLZYtr176ZLK0FRLVl1HLftatdMn7UKCyM5uCUNsw45rVSXfpQFHk5PNB6wPt9xSuZF00pprep8iQ'
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 # Media files
 MEDIA_URL = '/media/'
